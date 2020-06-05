@@ -28,6 +28,8 @@ import requests
 import traceback
 import sys
 
+MATCH_ALL = re.compile(r"(.*)")
+
 def backtrace():
     """Simple shorthand for printing trace-back for an exception"""
     traceback.print_exception(*sys.exc_info())
@@ -54,17 +56,39 @@ class HookManager:
 
     def __init__(self):
         self.messageHooks = []
+        self.mentionHooks = []
         self.actionHooks = []
 
-    def add_message_hook(self, pattern, callback):
+    def add_message_hook(self, pattern=None, callback=None, priority = None):
         cname = callback.__name__
         print(f"Registering message hook '{pattern}' for function {cname}...")
-        self.messageHooks.append([re.compile(pattern), callback, cname])
+        if isinstance(pattern, str):
+            pattern = re.compile(pattern)
+        blob = [pattern, callback, cname]
+        if priority is not None:
+            self.messageHooks.insert(priority, blob)
+        else:
+            self.messageHooks.append(blob)
 
-    def add_action_hook(self, actionid, callback):
+    def add_mention_hook(self, pattern=None, callback=None, priority=None):
+        cname = callback.__name__
+        print(f"Registering mention hook '{pattern}' for function {cname}...")
+        if isinstance(pattern, str):
+            pattern = re.compile(pattern)
+        blob = [pattern, callback, cname]
+        if priority is not None:
+            self.mentionHooks.insert(priority, blob)
+        else:
+            self.mentionHooks.append(blob)
+
+    def add_action_hook(self, actionid, callback, priority=None):
         cname = callback.__name__
         print(f"Registering action hook '{actionid}' for function {cname}...")
-        self.actionHooks.append([actionid, callback, cname])
+        blob = [actionid, callback, cname]
+        if priority is not None:
+            self.actionHooks.insert(priority, blob)
+        else:
+            self.actionHooks.append(blob)
 
 
 def handle_message(payload):
@@ -77,12 +101,32 @@ def handle_message(payload):
         if payload['event'].get('type') == 'message':
             msg = payload['event'].get('text')
             if msg:
+                # Mentioning the bot?
+                if f"<@{config['whoami']}>" in msg:
+                    for mhook in hooks.mentionHooks:
+                        pattern, callback, cname = mhook
+                        if not pattern:
+                            pattern = MATCH_ALL
+                        match = pattern.search(msg)
+                        if match:
+                            try:
+                                rv = callback(payload['event'], match)
+                                if rv:  # If handler tells us it served this, break
+                                    break
+                            except Exception as e:
+                                print(f"Could not run callback function {cname}: {e}")
+                                backtrace()
+                # Standard message hooks
                 for mhook in hooks.messageHooks:
                     pattern, callback, cname = mhook
+                    if not pattern:
+                        pattern = MATCH_ALL
                     match = pattern.search(msg)
                     if match:
                         try:
-                            callback(payload['event'], match)
+                            rv = callback(payload['event'], match)
+                            if rv:  # If handler tells us it served this, break
+                                break
                         except Exception as e:
                             print(f"Could not run callback function {cname}: {e}")
                             backtrace()
@@ -134,6 +178,7 @@ if __name__ == "__main__":
 
     # Initialize a Web API client
     slack_web_client = slack.WebClient(token=config['server']['slack_token'])
+    config['whoami'] = slack_web_client.api_call("auth.test")["user_id"]
 
     # Initialize hooks
     hooks = HookManager()
@@ -142,7 +187,12 @@ if __name__ == "__main__":
     pdir = config['server']['plugindir']
     plugin_files = [fpath[:-3] for fpath in os.listdir(pdir) if fpath.endswith('.py')]
     for plugin_file in plugin_files:
-        importlib.import_module(f'plugins.{plugin_file}').load(config, hooks, slack_web_client)
+        print(f"Loading module {plugin_file}...")
+        try:
+            importlib.import_module(f'plugins.{plugin_file}').load(config, hooks, slack_web_client)
+        except:  # Broad on purpose! Backtrace will tell more, but we need flask to run regardless of what happened
+            print("Could not load module, skipping:")
+            backtrace()
 
     # Spin up the Flask server
     app.run(host=config['server']['host'], port=config['server']['port'])
