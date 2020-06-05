@@ -15,6 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Simple PagerDuty helper plugin for GomeBot"""
+"""
+To enable PagerDuty calls, add the following to gnomebot.yaml:
+
+pagerduty:
+  apikey:  api-key-goes-here
+
+"""
 import pdpyras
 import re
 import gnomebot
