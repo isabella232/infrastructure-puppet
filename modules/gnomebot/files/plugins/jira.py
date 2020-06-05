@@ -19,6 +19,7 @@
 """
 Sample YAML configuration in gnomebot.yaml:
 jira:
+  pubsub: http://pubsub.apache.org:2069/jira/
   subscriptions:
     infra_openclose:
       project: INFRA
@@ -29,7 +30,7 @@ jira:
       events: ~  # Handle all events
       channel: '#asfjira'
     jira_all:
-      project: ALL  # All JIRA tickets
+      project: ~  # All JIRA tickets
       events: ~ # All events
       channel: '#spam'
 """
@@ -43,10 +44,11 @@ SLACK_WEB_CLIENT = None
 CFG = None
 
 def jira_details_callback(event, value):
+    baseurl = CFG['jira']['baseurl']
     if value in JIRA_CACHE: # We only handle JIRAs we've seen..
         title, desc = JIRA_CACHE[value]
         return {
-            "text": f"<https://issues.apache.org/jira/browse/{value}|{value}>: {title}\n{desc}",
+            "text": f"<{baseurl}{value}|{value}>: {title}\n{desc}",
             "replace_original": False,
             "response_type": "ephemeral",
         }
@@ -56,6 +58,7 @@ def jira_description(event, match):
     key = match.group(1)
     title = None
     desc = None
+    baseurl = CFG['jira']['baseurl']
     if key in JIRA_CACHE:
         title, desc = JIRA_CACHE[key]
     else:
@@ -75,7 +78,7 @@ def jira_description(event, match):
                         "block_id": "title",
                         "text": {
                             "type": "mrkdwn",
-                            "text": f"<https://issues.apache.org/jira/browse/{key}|{key}>: {title}"
+                            "text": f"<{baseurl}{key}|{key}>: {title}"
                         },
                         "accessory":
                             {
@@ -102,6 +105,7 @@ def jira_parse_event(event):
     author = event['author']
     key = event['key']
     title = event['summary']
+    baseurl = CFG['jira']['baseurl']
     js = None
     # New JIRA
     if event['action'] == 'create':
@@ -110,7 +114,7 @@ def jira_parse_event(event):
             desc = desc[:200] + '...'
         js = [
             {
-                "pretext": f"*{author}* created <https://issues.apache.org/jira/browse/{key}|{key}>: {title}",
+                "pretext": f"*{author}* created <{baseurl}{key}|{key}>: {title}",
                 "title": f"{key}: {title}",
                 "text": desc,
                 "mrkdwn_in": ["pretext"]
@@ -121,7 +125,7 @@ def jira_parse_event(event):
         res = event.get('resolution', 'Fixed')
         js = [
             {
-                "pretext": f"*{author}* closed <https://issues.apache.org/jira/browse/{key}|{key}> as {res}",
+                "pretext": f"*{author}* closed <{baseurl}{key}|{key}> as {res}",
                 "title": f"{key}: {title}",
                 "text": '',
                 "mrkdwn_in": ["pretext"]
@@ -136,7 +140,7 @@ def jira_parse_event(event):
             return
         js = [
             {
-                "pretext": f"*{author}* changed <https://issues.apache.org/jira/browse/{key}|{key}> from {fr} to {to}.",
+                "pretext": f"*{author}* changed <{baseurl}{key}|{key}> from {fr} to {to}.",
                 "title": f"{key}: {title}",
                 "text": '',
                 "mrkdwn_in": ["pretext"]
@@ -148,11 +152,11 @@ def jira_parse_event(event):
         fr = event.get('from')
         to = event.get('to')
         if not to:
-            prt = f"*{author}* unassigned <https://issues.apache.org/jira/browse/{key}|{key}>."
+            prt = f"*{author}* unassigned <{baseurl}{key}|{key}>."
         elif not fr:
-            prt = f"*{author}* assigned <https://issues.apache.org/jira/browse/{key}|{key}> to *{to}*."
+            prt = f"*{author}* assigned <{baseurl}{key}|{key}> to *{to}*."
         else:
-            prt = f"*{author}* changed assignment of <https://issues.apache.org/jira/browse/{key}|{key}> from *{fr}* to *{to}*."
+            prt = f"*{author}* changed assignment of <{baseurl}{key}|{key}> from *{fr}* to *{to}*."
 
         js = [
             {
@@ -168,7 +172,7 @@ def jira_parse_event(event):
         comment = event['body']
         js = [
             {
-                "pretext": f"*{author}* commented on <https://issues.apache.org/jira/browse/{key}|{key}> - {title}:",
+                "pretext": f"*{author}* commented on <{baseurl}{key}|{key}> - {title}:",
                 "title": f"",
                 "text": comment,
                 "mrkdwn_in": ["pretext"]
@@ -189,13 +193,13 @@ def jira_parse_event(event):
                         print(f"Could not post JIRA event message to Slack channel {chan}: {e}")
 
 def jira_listener(t):
-    listener = asfpy.pubsub.Listener('http://pubsub.apache.org:2069/jira')  #TODO: make configurable?
+    listener = asfpy.pubsub.Listener(CFG['jira']['pubsub'])
     listener.attach(jira_parse_event, raw=True)
 
 
-def load(cfg, hooks, swc):
+def load(cfg: dict, hooks: gnomebot.HookManager, slack_client):
     global SLACK_WEB_CLIENT, CFG
-    SLACK_WEB_CLIENT = swc
+    SLACK_WEB_CLIENT = slack_client
     CFG = cfg
     # Add a hook to all messages with [A-Z]+-\d+, like INFRA-1234
     hooks.add_message_hook(r"\b([A-Z]+-\d+)\b", jira_description)
