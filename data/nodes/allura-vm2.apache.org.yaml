@@ -1,7 +1,6 @@
 ---
 classes:
   - allura_pvm_asf
-  - blocky
   - loggy
   - stunnel_asf
 
