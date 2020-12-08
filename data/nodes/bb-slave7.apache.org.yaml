@@ -4,7 +4,7 @@ classes:
   - buildbot_node
   - buildbot_node::cpan
   - buildbot_node::rat
-  - buildbot_node::rvm
+  - rvm
 
 buildbot_node::slave_name: 'bb_slave7_ubuntu'
 
@@ -18,6 +18,14 @@ buildbot_node::required_packages:
   - 'libsystemd-dev'
   - 'libxml2-dev'
   - 'zlib1g-dev'
+  - 'graphviz'
+  - 'graphviz-dev'
+  - 'libtool'
+  - 'libpcre3'
+  - 'libpcre3-dev'
+  - 'tomcat7'
+  - 'ruby2.0'
+  - 'ruby2.0-dev'
 
 buildbot_node::cpan::cpan_modules: 
 - 'AnyEvent'
@@ -47,3 +55,26 @@ buildbot_node::rat::projects:
 python::python_pips:
   mkdocs:
     ensure: present
+  pelican:
+    ensure: present
+  markdown:
+    ensure: present
+  py-gfm:
+    ensure: present
+  beautifulsoup4:
+    ensure: present
+
+ruby_version: '2.4.6'
+
+rvm::system_rubies:
+  "ruby-%{hiera('ruby_version')}": {}
+
+rvm::system_users:
+  - buildnode
+
+rvm::rvm_gems:
+  'jekyll':
+    name: 'jekyll'
+    ruby_version: "ruby-%{hiera('ruby_version')}"
+    ensure: latest
+
