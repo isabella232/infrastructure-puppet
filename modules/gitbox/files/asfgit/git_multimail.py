@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-
+# -*- coding: utf-8 -*-
 # ASF PART GOES HERE
 NO_DEFAULT = object()
 ROOT_DIRS = ['/x1/repos/asf', '/x1/repos/private']
