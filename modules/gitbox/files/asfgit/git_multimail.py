@@ -102,6 +102,7 @@ repo_dir = os.path.join(os.environ.get("GIT_PROJECT_ROOT"), "%s.git" % repo_name
 committer = os.environ.get("GIT_COMMITTER_NAME")
 sendmail = _git_config("hooks.asfgit.sendmail").strip()
 recipient = get_recipient(repo_name, 'commit', None)
+unsubscribe = recipient.replace('@', '-unsubscribe@')
 recips = ['"%s" <%s>' % (recipient, recipient)]
 subject_fmt = _git_config("hooks.asfgit.subject-fmt", DEFAULT_SUBJECT)
 max_size = int(_git_config("hooks.asfgit.max-size"))
@@ -328,8 +329,10 @@ in repository https://gitbox.apache.org/repos/asf/%(repo_shortname)s.git.
 
 """
 
+# N.B. the traiing space following '--' below is intentional
 FOOTER_TEMPLATE = """\
-
+-- 
+To unsubscribe, email %(unsubscribe)s
 """
 
 REWIND_ONLY_TEMPLATE = """\
