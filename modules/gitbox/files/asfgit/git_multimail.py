@@ -330,10 +330,9 @@ in repository https://gitbox.apache.org/repos/asf/%(repo_shortname)s.git.
 """
 
 # N.B. the trailing space following '--' below is intentional
-FOOTER_TEMPLATE = """\
+FOOTER_TEMPLATE = """
 
-
--- 
+--
 To unsubscribe, email %s
 """ % unsubscribe
 
