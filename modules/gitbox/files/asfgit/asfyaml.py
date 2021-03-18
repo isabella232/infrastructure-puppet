@@ -244,13 +244,14 @@ def getEnabledProtectedBranchList (GH_TOKEN, repo_name, url, isLast):
 
     return branchCollection
 
-def setProtectedBranch (GH_TOKEN, cfg, branch, required_status_checks, required_pull_request_reviews):
+def setProtectedBranch (GH_TOKEN, cfg, branch, required_status_checks, required_pull_request_reviews, required_linear_history):
     REQ_URL = GH_BRANCH_PROTECTION_URL_TPL % (cfg.repo_name, branch)
     response = requests.put(REQ_URL, headers = {'Accept': GH_BRANCH_PROTECTION_URL_ACCEPT, "Authorization": "token %s" % GH_TOKEN}, json = {
         'enforce_admins': None,
         'restrictions': None,
         'required_status_checks': required_status_checks,
-        'required_pull_request_reviews': required_pull_request_reviews
+        'required_pull_request_reviews': required_pull_request_reviews,
+        'required_linear_history': required_linear_history,
     })
 
     if not (200 <= response.status_code < 300):
@@ -461,6 +462,7 @@ def github(cfg, yml):
                 )
 
                 required_signatures = pb_branch_data.get("required_signatures", False)
+                required_linear_history = pb_branch_data.get("required_linear_history", False)
 
                 # GH API Calls to add/update
                 setProtectedBranch(
@@ -468,7 +470,8 @@ def github(cfg, yml):
                     cfg,
                     pb_branch,
                     required_status_checks,
-                    required_pull_request_reviews
+                    required_pull_request_reviews,
+                    required_linear_history
                 )
 
                 setProtectedBranchRequiredSignature(
