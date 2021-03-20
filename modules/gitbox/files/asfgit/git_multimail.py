@@ -170,7 +170,6 @@ import shlex
 import optparse
 import logging
 import smtplib
-
 try:
     import ssl
 except ImportError:
@@ -197,17 +196,13 @@ if PYTHON3:
     def is_string(s):
         return isinstance(s, str)
 
-
     def str_to_bytes(s):
         return s.encode(ENCODING)
-
 
     def bytes_to_str(s, errors='strict'):
         return s.decode(ENCODING, errors)
 
-
     unicode = str
-
 
     def write_str(f, msg):
         # Try outputing with the default encoding. If it fails,
@@ -216,7 +211,6 @@ if PYTHON3:
             f.buffer.write(msg.encode(sys.getdefaultencoding()))
         except UnicodeEncodeError:
             f.buffer.write(msg.encode(ENCODING))
-
 
     def read_line(f):
         # Try reading with the default encoding. If it fails,
@@ -233,22 +227,17 @@ else:
         except NameError:  # Silence Pyflakes warning
             raise
 
-
     def str_to_bytes(s):
         return s
-
 
     def bytes_to_str(s, errors='strict'):
         return s
 
-
     def write_str(f, msg):
         f.write(msg)
 
-
     def read_line(f):
         return f.readline()
-
 
     def next(it):
         return it.next()
@@ -269,6 +258,7 @@ except ImportError:
     from email.Utils import formatdate
     from email.Header import Header
 
+
 DEBUG = False
 
 ZEROS = '0' * 40
@@ -282,6 +272,7 @@ ADDR_HEADERS = set(['from', 'to', 'cc', 'bcc', 'reply-to', 'sender'])
 # anyway, to make it easier to find (at least most of) the places
 # where the encoding is important.
 (ENCODING, CHARSET) = ('UTF-8', 'utf-8')
+
 
 REF_CREATED_SUBJECT_TEMPLATE = (
     '%(emailprefix)s%(refname_type)s %(short_refname)s created'
@@ -351,6 +342,7 @@ Any revisions marked "omit" are not gone; other references still
 refer to them.  Any revisions marked "discard" are gone forever.
 """
 
+
 NON_FF_TEMPLATE = """\
 This update added new revisions after undoing existing revisions.
 That is to say, some revisions that were in the old version of the
@@ -370,19 +362,23 @@ Any revisions marked "omit" are not gone; other references still
 refer to them.  Any revisions marked "discard" are gone forever.
 """
 
+
 NO_NEW_REVISIONS_TEMPLATE = """\
 No new revisions were added by this update.
 """
 
+
 DISCARDED_REVISIONS_TEMPLATE = """\
 This change permanently discards the following revisions:
 """
+
 
 NO_DISCARDED_REVISIONS_TEMPLATE = """\
 The revisions that were on this %(refname_type)s are still contained in
 other references; therefore, this change does not discard any commits
 from the repository.
 """
+
 
 NEW_REVISIONS_TEMPLATE = """\
 The %(tot)s revisions listed above as "new" are entirely new to this
@@ -392,9 +388,11 @@ been added to this reference.
 
 """
 
+
 TAG_CREATED_TEMPLATE = """\
       at %(newrev_short)-8s (%(newrev_type)s)
 """
+
 
 TAG_UPDATED_TEMPLATE = """\
 *** WARNING: tag %(short_refname)s was modified! ***
@@ -403,10 +401,12 @@ TAG_UPDATED_TEMPLATE = """\
       to %(newrev_short)-8s (%(newrev_type)s)
 """
 
+
 TAG_DELETED_TEMPLATE = """\
 *** WARNING: tag %(short_refname)s was deleted! ***
 
 """
+
 
 # The template used in summary tables.  It looks best if this uses the
 # same alignment as TAG_CREATED_TEMPLATE and TAG_UPDATED_TEMPLATE.
@@ -414,11 +414,13 @@ BRIEF_SUMMARY_TEMPLATE = """\
 %(action)8s %(rev_short)-8s %(text)s
 """
 
+
 NON_COMMIT_UPDATE_TEMPLATE = """\
 This is an unusual reference change because the reference did not
 refer to a commit either before or after the change.  We do not know
 how to provide full information about this reference change.
 """
+
 
 REVISION_HEADER_TEMPLATE = """\
 Date: %(send_date)s
@@ -459,7 +461,9 @@ LINK_HTML_TEMPLATE = """\
 <p><a href="%(browse_url)s">View the commit online</a>.</p>
 """
 
+
 REVISION_FOOTER_TEMPLATE = FOOTER_TEMPLATE
+
 
 # Combined, meaning refchange+revision email (for single-commit additions)
 COMBINED_HEADER_TEMPLATE = """\
@@ -511,6 +515,7 @@ class ConfigurationException(Exception):
 
 # The "git" program (this could be changed to include a full path):
 GIT_EXECUTABLE = 'git'
+
 
 # How "git" should be invoked (including global arguments), as a list
 # of words.  This variable is usually initialized automatically by
@@ -1845,7 +1850,6 @@ class BranchChange(ReferenceChange):
             # from the BranchChange object.
             revision._content_type = self._content_type
             return revision.generate_browse_link(base_url)
-
         self.generate_browse_link = revision_gen_link
         for line in self.generate_email(push, body_filter, values):
             yield line
@@ -2173,7 +2177,6 @@ class SMTPMailer(Mailer):
                 except TypeError:
                     # Old Python versions do not have timeout= argument.
                     return klass(server)
-
             if self.security == 'none':
                 self.smtp = call(smtplib.SMTP, self.smtpserver, timeout=self.smtpservertimeout)
             elif self.security == 'ssl':
