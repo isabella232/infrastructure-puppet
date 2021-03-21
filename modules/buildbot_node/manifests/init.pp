@@ -17,6 +17,7 @@ class buildbot_node (
   $slave_password,
   $gsr_user,
   $gsr_pw,
+  $buildbot_svn_credentials,
   $nexus_password = '',
   $npmrc_password = '',
   $bb_basepackages = [],
@@ -177,6 +178,31 @@ class buildbot_node (
       group   => $groupname,
       mode    => '0640',
       source  => 'puppet:///modules/buildbot_node/ssh/config';
+
+    "/home/${username}/.subversion":
+      ensure => directory,
+      owner  => $username,
+      group  => $groupname,
+      mode   => '0750';
+    "/home/${username}/.subversion/auth":
+      ensure  => directory,
+      owner   => $username,
+      group   => $groupname,
+      mode    => '0750',
+      require => File["/home/${username}/.subversion"];
+    "/home/${username}/.subversion/auth/svn.simple":
+      ensure  => directory,
+      owner   => $username,
+      group   => $groupname,
+      mode    => '0750',
+      require => File["/home/${username}/.subversion/auth"];
+    "/home/${username}/.subversion/auth/svn.simple/d3c8a345b14f6a1b42251aef8027ab57":
+      ensure  => present,
+      owner   => $username,
+      group   => $groupname,
+      mode    => '0640',
+      content => template('buildbot_node/svn-credentials.erb'),
+      require => File["/home/${buildbot_node::username}/.subversion/auth/svn.simple"];
 
     "/home/${username}/slave":
       ensure  => directory,
