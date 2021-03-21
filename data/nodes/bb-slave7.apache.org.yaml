@@ -4,7 +4,6 @@ classes:
   - buildbot_node
   - buildbot_node::cpan
   - buildbot_node::rat
-  - buildbot_node::rvm
 
 buildbot_node::slave_name: 'bb_slave7_ubuntu'
 
