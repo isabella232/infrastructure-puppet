@@ -40,7 +40,7 @@ def _repo_name():
 
 if os.environ.get('GIT_ORIGIN_REPO'):
   os.chdir(os.environ.get('GIT_ORIGIN_REPO'))
-_all_config = dict(c.split('=')
+_all_config = dict(c.split('=', 1)
                    for c in run.git('config', '--list')[1].splitlines()
                    if c.strip())
 if os.environ.get('GIT_WIKI_REPO'):
