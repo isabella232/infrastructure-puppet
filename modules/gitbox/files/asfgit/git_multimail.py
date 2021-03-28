@@ -176,7 +176,6 @@ except ImportError:
     # Python < 2.6 do not have ssl, but that's OK if we don't use it.
     pass
 import time
-import cgi
 
 PYTHON3 = sys.version_info >= (3, 0)
 
@@ -220,6 +219,12 @@ if PYTHON3:
             return out.decode(sys.getdefaultencoding())
         except UnicodeEncodeError:
             return out.decode(ENCODING)
+
+    import html
+
+    def html_escape(s):
+        return html.escape(s)
+
 else:
     def is_string(s):
         try:
@@ -241,6 +246,11 @@ else:
 
     def next(it):
         return it.next()
+
+    import cgi
+
+    def html_escape(s):
+        return cgi.escape(s, True)
 
 try:
     from email.charset import Charset
@@ -963,7 +973,7 @@ class Change(object):
         if html_escape_val:
             for k in values:
                 if is_string(values[k]):
-                    values[k] = cgi.escape(values[k], True)
+                    values[k] = html_escape(values[k])
         for line in template.splitlines(True):
             yield line % values
 
@@ -1047,7 +1057,7 @@ class Change(object):
             yield "<pre style='margin:0'>\n"
 
             for line in lines:
-                yield cgi.escape(line)
+                yield html_escape(line)
 
             yield '</pre>\n'
         else:
@@ -1122,7 +1132,7 @@ class Change(object):
                     fgcolor = '404040'
 
                 # Chop the trailing LF, we don't want it inside <pre>.
-                line = cgi.escape(line[:-1])
+                line = html_escape(line[:-1])
 
                 if bgcolor or fgcolor:
                     style = 'display:block; white-space:pre;'
