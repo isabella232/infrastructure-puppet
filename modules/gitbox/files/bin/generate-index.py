@@ -111,7 +111,7 @@ def getActivity():
             agotxt = "<span style='color: #070;'>%s</span>" % agotxt
             
         # Store in project hash
-        r = re.match(r"^(?:incubator-)?([^-.]+).*", repo)
+        r = re.match(r"^(?:incubator-)?(empire-db|[^-.]+).*", repo)
         project = r.group(1)
         projects[project] = projects.get(project, [])
         repo = repo.replace(".git", "") # Crop this for sorting reasons (INFRA-15952)
