@@ -410,6 +410,10 @@ def github(cfg, yml):
 
         if desc:
             repo.edit(description=desc)
+            # Update on gitbox as well
+            desc_path = os.path.join(cfg.repo_dir, "description")
+            with open(desc_path, "w") as f:
+                f.write(desc)
         if homepage:
             repo.edit(homepage=homepage)
         if merges:
