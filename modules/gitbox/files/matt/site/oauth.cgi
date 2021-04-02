@@ -244,13 +244,16 @@ def main():
         csec = m[1].strip()
         
         # Construct OAuth backend check POST data
-        rargs = "%s&client_id=%s&client_secret=%s" % (os.environ.get("QUERY_STRING"), cid, csec)
-        
-        response = requests.post("https://github.com/login/oauth/access_token", data = rargs).text
-        token = re.search(r"access_token=([a-f0-9]+)", response)
+        rargs = {
+            "code": code,
+            "client_id": cid,
+            "client_secret": csec,
+        }
+        headers = {'Accept': 'application/json'}
+        response = requests.post("https://github.com/login/oauth/access_token", headers=headers, params = rargs).json()
         # If we got an access token, fetch user data
-        if token:
-            js = requests.get("https://api.github.com/user", headers = {'Authorization': "TOKEN %s" % token.group(1)}).json()
+        if 'access_token' in response:
+            js = requests.get("https://api.github.com/user", headers = {'Authorization': "token %s" % response['access_token']}).json()
             valid = True
         
     # ASF Oauth callback
