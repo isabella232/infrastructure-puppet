@@ -83,7 +83,8 @@ def custombuild(cfg, yml):
 
     # Get notification list
     pnotify = yml.get('notify', cfg.recips[0])
-
+    # Exclude default table of contents
+    no_toc = yml.get('notoc', False)
     # Contact buildbot 2
     bbusr, bbpwd = open("/x1/gitbox/auth/bb2.txt").read().strip().split(':', 1)
     import requests
@@ -107,6 +108,7 @@ def custombuild(cfg, yml):
                     "buildscript": buildscript,
                     "outputdir": outputdir,
                     "notify": pnotify,
+                    "notoc": no_toc
                 }
             }
     print("Triggering custom build...")
@@ -197,7 +199,10 @@ def pelican(cfg, yml):
     
     # Get notification list
     pnotify = yml.get('notify', cfg.recips[0])
-    
+
+    # Get TOC boolean
+    no_toc = yml.get('notoc', False)
+
     # Contact buildbot 2
     bbusr, bbpwd = open("/x1/gitbox/auth/bb2.txt").read().strip().split(':', 1)
     import requests
@@ -217,6 +222,7 @@ def pelican(cfg, yml):
             "project": pname,
             "theme": theme,
             "notify": pnotify,
+            "notoc": no_toc,
         }
     }
     print("Triggering pelican build...")
