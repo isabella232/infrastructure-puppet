@@ -32,6 +32,11 @@ import requests
 
 SEEN = []
 
+# These are CI accounts that do not have ICLAs, one per line please
+OUR_BOTS = (
+    "asf-ci-deploy",
+)
+
 # GitHub -> GitBox code sync    
 def parse_payload(config, data):
     repo_dirs = config['paths']
@@ -195,7 +200,7 @@ def parse_payload(config, data):
             # Didn't find it, time to notify!!
             else:
                 asfid = "(unknown)"
-                if '[bot]' not in pusher: # If not internal GitHub bot, complain!
+                if '[bot]' not in pusher and pusher not in OUR_BOTS: # If not internal GitHub bot, complain!
                     # Send an email to users@infra.a.o with the bork
                     asfpy.messaging.mail(
                         recipient = '<private@infra.apache.org>',
@@ -206,7 +211,10 @@ def parse_payload(config, data):
                     asfid = 'not-in-ldap'
                     
                 else:
-                    asfid = 'github-bot' # Set to the pusher ID for internal recording in case of github bots
+                    if '[bot'] in pusher:
+                        asfid = 'github-bot' # Set to the pusher ID for internal recording in case of github bots
+                    else:
+                        asfid = pusher  # bots like asf-ci-deploy etc
     
             #######################################
             # Check that we haven't missed a push #
