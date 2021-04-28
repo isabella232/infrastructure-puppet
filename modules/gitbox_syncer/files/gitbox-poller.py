@@ -211,7 +211,7 @@ def parse_payload(config, data):
                     asfid = 'not-in-ldap'
                     
                 else:
-                    if '[bot'] in pusher:
+                    if '[bot]' in pusher:
                         asfid = 'github-bot' # Set to the pusher ID for internal recording in case of github bots
                     else:
                         asfid = pusher  # bots like asf-ci-deploy etc
