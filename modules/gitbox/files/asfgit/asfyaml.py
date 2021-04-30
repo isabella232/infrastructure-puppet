@@ -414,7 +414,7 @@ def github(cfg, yml):
             # Update on gitbox as well
             desc_path = os.path.join(cfg.repo_dir, "description")
             if isinstance(desc, str):
-                desc = unicode(desc, "utf-8"))
+                desc = unicode(desc, "utf-8")
             with io.open(desc_path, "w", encoding="utf8") as f:
                 f.write(desc)
         if homepage:
