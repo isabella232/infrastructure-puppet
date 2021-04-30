@@ -414,7 +414,7 @@ def github(cfg, yml):
             # Update on gitbox as well
             desc_path = os.path.join(cfg.repo_dir, "description")
             with io.open(desc_path, "w", encoding="utf8") as f:
-                f.write(desc)
+                f.write(desc.encode("utf-8"))
         if homepage:
             repo.edit(homepage=homepage)
         if merges:
