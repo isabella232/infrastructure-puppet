@@ -239,7 +239,7 @@ def getEnabledProtectedBranchList (GH_TOKEN, repo_name, url, isLast):
     for branch in response.json():
         branchCollection.append(branch.get("name"))
 
-    if response.links and response.links["next"] and not isLast:
+    if response.links and response.links.get("next") and not isLast:
         isLast = response.links["next"]["url"] == response.links["last"]["url"]
         branchCollection = branchCollection + getEnabledProtectedBranchList(GH_TOKEN, repo_name, response.links["next"]["url"], isLast)
 
