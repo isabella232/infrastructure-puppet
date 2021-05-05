@@ -4,7 +4,6 @@ import os
 import sys
 import json
 import subprocess
-import git
 import time
 import datetime
 import re
@@ -56,12 +55,6 @@ def getActivity():
         nocommit = os.path.exists(os.path.join(repopath, "nocommit"))
         if nocommit: repodesc += " (archived)"
 
-        # Get git config items
-        if False:
-            configpath = os.path.join(repopath, "config")
-            if os.path.exists(configpath):
-                gconf = git.GitConfigParser(configpath, read_only = True)
-            
         # Get latest commit timestamp, default to none
         lcommit = 0
         last_hour = int(time.time())
