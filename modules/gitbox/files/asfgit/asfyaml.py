@@ -201,7 +201,7 @@ def pelican(cfg, yml):
     pnotify = yml.get('notify', cfg.recips[0])
 
     # Get TOC boolean
-    no_toc = yml.get('notoc', False)
+    toc = yml.get('toc', True)
 
     # Contact buildbot 2
     bbusr, bbpwd = open("/x1/gitbox/auth/bb2.txt").read().strip().split(':', 1)
@@ -222,7 +222,7 @@ def pelican(cfg, yml):
             "project": pname,
             "theme": theme,
             "notify": pnotify,
-            "notoc": no_toc,
+            "toc": toc,
         }
     }
     print("Triggering pelican build...")
