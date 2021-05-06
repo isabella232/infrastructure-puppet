@@ -43,15 +43,11 @@ CONFIG.read(CONFIG_FILE) # Shhhh
 TOKEN = CONFIG.get('github', 'token')
 
 
-def rename_github_repo(token, old, new):
+def update_github_repo(token, old):
     """
     Renames a repository on GitHub by sending a PATCH request.
     """
-    # Cut away the .git ending if it's there
-    old = old.replace(".git", "")
-    new = new.replace(".git", "")
-
-    # API URL for patching the name
+    # API URL for archiving
     url = "https://api.github.com/repos/apache/%s" % old
 
     # Headers - json payload + creds
@@ -61,15 +57,14 @@ def rename_github_repo(token, old, new):
 
     # Construct payload
     payload = json.dumps({
-        'name': new,
         'archived': True
     })
 
     # Run the request
-    print("  - Changing repository from %s to %s on GitHub..." % (old, new))
+    print("  - Changing repository to archived on GitHub...")
     r = requests.patch(url, headers = headers, data = payload, auth = (token, 'x-oauth-basic'))
     if r.status_code == requests.codes.ok:
-        print("  - Repository name changed!")
+        print("  - Repository Archived!")
     else:
         print("  - Something went wrong :(")
         print(r.text)
@@ -77,29 +72,11 @@ def rename_github_repo(token, old, new):
         print("Fix the issue and run the tool again.")
         sys.exit(-1)
 
-def rename_local_repo(old, new, project):
+def update_local_repo(old, project):
     """
     Renames local repositories:
-        - Rename the git dir
-        - Change remote origin (svn or git)
-        - Change commit notification ML
         - Change PR notification ML
     """
-    # First, rename the dir on the box. Fall flat on our behind if this fails.
-    print("  - Renaming gitbox repo from %s/%s to %s/%s..." % (REPO_ROOT, old, REPO_ROOT, new))
-    os.rename("%s/%s" % (REPO_ROOT, old), "%s/%s" % (REPO_ROOT, new))
-
-    # Change git config options
-    gcpath = "%s/%s/config" % (REPO_ROOT, new)
-    if not os.path.exists(gcpath):
-        gcpath = "%s/%s/.git/config" % (REPO_ROOT, new)
-    gconf = git.GitConfigParser(gcpath, read_only = False)
-
-    # Remote origin on GitHub
-    if gconf.has_section('remote "origin"'):
-        print("  - Setting remote...")
-        gconf.set('remote "origin"', 'url', "https://github.com/apache/%s" % new)
-
     # ML notification targets for commits and PRs
     print("  - Changing notification options..")
     if gconf.has_option('hooks.asfgit', 'recips'):
@@ -130,11 +107,10 @@ if len(sys.argv) == 2:
             m = re.match(r"^%s(-.+)?(\.git)?$"% PROJECT, repo)
             if m:
                 pr += 1
-                new = "attic-%s" % repo
-                print("Changing %s to %s..." % (repo, new))
+                print("Archiving %s..." % (repo))
                 if not DEBUG:
-                    rename_local_repo(repo, new, PROJECT)
-                    rename_github_repo(TOKEN, repo, new)
+                    update_local_repo(repo, PROJECT)
+                    update_github_repo(TOKEN, repo)
         print("All done, processed %u repositories!" % pr)
     else:
         print("%s does not seem to be a directory, aborting!" % REPO_ROOT)
