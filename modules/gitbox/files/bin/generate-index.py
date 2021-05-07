@@ -8,6 +8,7 @@ import time
 import datetime
 import re
 import requests
+import datetime
 
 GITPATH = "/x1/repos/asf"
 PODLINGS_URL = "https://whimsy.apache.org/public/public_podlings.json"
@@ -168,6 +169,8 @@ def getActivity():
     
         table += "</table>"
         html += table
+    now = datetime.datetime.now().isoformat()
+    html += "<hr/><p>Index last updated: %s</p>\n" % now
     return html, outjson, comcounts
 
 
