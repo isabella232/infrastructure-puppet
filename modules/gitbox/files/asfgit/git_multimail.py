@@ -112,6 +112,10 @@ max_emails = int(_git_config("hooks.asfgit.max-emails"))
 if repo_name.endswith('.wiki'):
     sys.exit(0)
 
+# if recipient is dev@null, ignore this
+if recipient == "dev@null":
+    sys.exit(0)
+
 # END ASF PART
 
 __version__ = '1.5.dev'
