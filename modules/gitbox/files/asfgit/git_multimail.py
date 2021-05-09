@@ -112,7 +112,7 @@ max_emails = int(_git_config("hooks.asfgit.max-emails"))
 if repo_name.endswith('.wiki'):
     sys.exit(0)
 
-# if recipient is dev@null, ignore this
+# if recipient is dev@null, ignore this as per https://cwiki.apache.org/confluence/display/INFRA/GitBox#GitBox-Disablingcommitemails
 if recipient == "dev@null":
     sys.exit(0)
 
