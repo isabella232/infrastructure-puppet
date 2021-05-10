@@ -135,10 +135,9 @@ if len(sys.argv) == 2:
                 if not DEBUG:
                     rename_local_repo(repo, new, PROJECT)
                     rename_github_repo(TOKEN, repo, new)
-                    print("heh")
         print("All done, processed %u repositories!" % pr)
     else:
         print("%s does not seem to be a directory, aborting!" % REPO_ROOT)
 else:
-    print("Usage: attic-repos.py $project")
-    print("Example: attic-repos.py blur")
+    print("Usage: unattic-rename.py $project")
+    print("Example: unattic-rename.py blur")
