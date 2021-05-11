@@ -110,9 +110,9 @@ def rename_local_repo(old, new, project):
         gconf.set('apache', 'dev', ml)
 
     # Set GitBox repo to read-only
-    if not os.path.isfile("%s/%s/.nocommit" % (REPO_ROOT, new)):
-        print("  - Creating %s/%s/.nocommit" % (REPO_ROOT, new))
-        open("%s/%s/.nocommit", 'a')
+    if not os.path.isfile("%s/%s/nocommit" % (REPO_ROOT, new)):
+        print("  - Creating %s/%s/nocommit" % (REPO_ROOT, new))
+        open("%s/%s/nocommit" % (REPO_ROOT, new), 'a+')
     print("  - Done!")
 
 # Demand being run by www-data or git
@@ -135,8 +135,8 @@ if len(sys.argv) == 2:
                 new = repo.split('-',1)[-1]
                 print("Changing %s to %s..." % (repo, new))
                 if not DEBUG:
-#                    rename_local_repo(repo, new, PROJECT)
                     rename_github_repo(TOKEN, repo, new)
+                    rename_local_repo(repo, new, PROJECT)
         print("All done, processed %u repositories!" % pr)
     else:
         print("%s does not seem to be a directory, aborting!" % REPO_ROOT)
