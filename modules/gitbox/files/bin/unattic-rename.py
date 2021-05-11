@@ -62,7 +62,7 @@ def rename_github_repo(token, old, new):
     # Construct payload
     payload = json.dumps({
         'name': new,
-    #    'archived': True
+        'archived': True
     })
 
     # Run the request
@@ -111,6 +111,10 @@ def rename_local_repo(old, new, project):
         print("    - Changing PR notification ML to %s" % ml)
         gconf.set('apache', 'dev', ml)
 
+    # Set GitBox repo to read-only
+    if not os.path.isfile("%s/%s/.nocommit" % (REPO_ROOT, new)):
+	print("Creating %s/%s/.nocommit" % (REPO_ROOT, new))
+	open("%s/%s/.nocommit", 'a')
     print("  - Done!")
 
 # Demand being run by www-data or git
