@@ -42,9 +42,26 @@ CONFIG = configparser.ConfigParser()
 CONFIG.read(CONFIG_FILE) # Shhhh
 TOKEN = CONFIG.get('github', 'token')
 
+def gh_patch(url, payload, token):
+    """
+    Sends patch requests to github
+    """
+    headers = {
+        'content-type': 'application/json',
+    }
+    r = requests.patch(url, headers = headers, data = payload, auth = (token, 'x-oauth-basic'))
+    if r.status_code == requests.codes.ok:
+        return True
+    else:
+        print("  - Something went wrong :(")
+        print(r.text)
+        print("Something did not work here, aborting process!!")
+        print("Fix the issue and run the tool again.")
+        sys.exit(-1)
+    
 def rename_github_repo(token, old, new):
     """
-    Renames a repository on GitHub by sending a PATCH request.
+    Rename an archived repository on GitHub
     """
     # Cut away the .git ending if it's there
     old = old.replace(".git", "")
@@ -53,45 +70,10 @@ def rename_github_repo(token, old, new):
     # API URL for patching the name
     url = "https://api.github.com/repos/apache/%s" % old
 
-    # Headers - json payload + creds
-    headers = {
-        'content-type': 'application/json',
-    }
-
-    # Construct payload
-    payload = json.dumps({
-        'archived': False
-    })
-
-    # Run the request
-    print("  - Unarchiving repository for name change GitHub...")
-    r = requests.patch(url, headers = headers, data = payload, auth = (token, 'x-oauth-basic'))
-    if r.status_code == requests.codes.ok:
-        print("  - Repository name changed!")
-    else:
-        print("  - Something went wrong :(")
-        print(r.text)
-        print("Something did not work here, aborting process!!")
-        print("Fix the issue and run the tool again.")
-        sys.exit(-1)
-
-    # Construct rename and re-archive payload
-    payload = json.dumps({
-        'name': new,
-        'archived': True
-    })
-
-    # Run the request
+    # Rename and Archive repository
     print("  - Changing repository from %s to %s on GitHub and re-setting archive..." % (old, new))
-    r = requests.patch(url, headers = headers, data = payload, auth = (token, 'x-oauth-basic'))
-    if r.status_code == requests.codes.ok:
-        print("  - Success!")
-    else:
-        print("  - Something went wrong :(")
-        print(r.text)
-        print("Something did not work here, aborting process!!")
-        print("Fix the issue and run the tool again.")
-        sys.exit(-1)
+    gh_patch(url, json.dumps({'name': new, 'archived': True}), token)
+    print("  - Success!")
 
 def rename_local_repo(old, new, project):
     """
@@ -153,7 +135,7 @@ if len(sys.argv) == 2:
                 new = repo.split('-',1)[-1]
                 print("Changing %s to %s..." % (repo, new))
                 if not DEBUG:
-                    rename_local_repo(repo, new, PROJECT)
+#                    rename_local_repo(repo, new, PROJECT)
                     rename_github_repo(TOKEN, repo, new)
         print("All done, processed %u repositories!" % pr)
     else:
