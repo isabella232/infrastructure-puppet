@@ -35,13 +35,12 @@ import git
 import configparser
 import pwd
 
-DEBUG = True
+DEBUG = False
 REPO_ROOT = "/x1/repos/asf" # Root dir for all repos
 CONFIG_FILE = "/x1/gitbox/matt/tools/grouper.cfg" # config file with GH token in it
 CONFIG = configparser.ConfigParser()
 CONFIG.read(CONFIG_FILE) # Shhhh
 TOKEN = CONFIG.get('github', 'token')
-
 
 def rename_github_repo(token, old, new):
     """
@@ -61,15 +60,32 @@ def rename_github_repo(token, old, new):
 
     # Construct payload
     payload = json.dumps({
+        'archived': False
+    })
+
+    # Run the request
+    print("  - Unarchiving repository for name change GitHub...")
+    r = requests.patch(url, headers = headers, data = payload, auth = (token, 'x-oauth-basic'))
+    if r.status_code == requests.codes.ok:
+        print("  - Repository name changed!")
+    else:
+        print("  - Something went wrong :(")
+        print(r.text)
+        print("Something did not work here, aborting process!!")
+        print("Fix the issue and run the tool again.")
+        sys.exit(-1)
+
+    # Construct rename and re-archive payload
+    payload = json.dumps({
         'name': new,
         'archived': True
     })
 
     # Run the request
-    print("  - Changing repository from %s to %s on GitHub..." % (old, new))
+    print("  - Changing repository from %s to %s on GitHub and re-setting archive..." % (old, new))
     r = requests.patch(url, headers = headers, data = payload, auth = (token, 'x-oauth-basic'))
     if r.status_code == requests.codes.ok:
-        print("  - Repository name changed!")
+        print("  - Success!")
     else:
         print("  - Something went wrong :(")
         print(r.text)
@@ -113,8 +129,8 @@ def rename_local_repo(old, new, project):
 
     # Set GitBox repo to read-only
     if not os.path.isfile("%s/%s/.nocommit" % (REPO_ROOT, new)):
-	print("Creating %s/%s/.nocommit" % (REPO_ROOT, new))
-	open("%s/%s/.nocommit", 'a')
+        print("  - Creating %s/%s/.nocommit" % (REPO_ROOT, new))
+        open("%s/%s/.nocommit", 'a')
     print("  - Done!")
 
 # Demand being run by www-data or git
