@@ -107,7 +107,7 @@ def getActivity():
             agotxt = "<span style='color: #070;'>%s</span>" % agotxt
             
         # Store in project hash
-        r = re.match(r"^(?:incubator-)?(empire-db|[^-.]+).*", repo)
+        r = re.match(r"^(?:incubator-(?:retired-)?)?(empire-db|[^-.]+).*", repo)
         project = r.group(1)
         projects[project] = projects.get(project, [])
         repo = repo.replace(".git", "") # Crop this for sorting reasons (INFRA-15952)
@@ -126,6 +126,8 @@ def getActivity():
             pname = "Apache " + TLPS['committees'][project]['display_name']
         elif project in RETIRED['retired']:
             pname = "Apache " + (RETIRED['retired'][project]['display_name'] or pname) + ' (Retired)'
+        elif project in PODLINGS['podling'] and PODLINGS['podling'][project]['status'] == 'retired':
+            pname = "Apache " + PODLINGS['podling'][project]['name'] + " (Retired Podling)"
         elif project in PODLINGS['podling'] and PODLINGS['podling'][project]['status'] != 'graduated':
             pname = "Apache " + PODLINGS['podling'][project]['name'] + " (Incubating)"
         
