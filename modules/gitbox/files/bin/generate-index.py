@@ -13,6 +13,7 @@ import datetime
 GITPATH = "/x1/repos/asf"
 PODLINGS_URL = "https://whimsy.apache.org/public/public_podlings.json"
 TLPS_URL = "https://whimsy.apache.org/public/committee-info.json"
+RETIRED_URL = "https://whimsy.apache.org/public/committee-retired.json"
 JSONFILE = "/x1/gitbox/htdocs/repositories.json"
 TXTFILE = "/x1/gitbox/htdocs/repos.txt"
 
@@ -30,6 +31,7 @@ def getActivity():
     # Get Whimsy data first
     PODLINGS = requests.get(PODLINGS_URL).json()
     TLPS = requests.get(TLPS_URL).json()
+    RETIRED = requests.get(RETIRED_URL).json()
     
     repos = [x for x in os.listdir(GITPATH) if
                  os.path.isdir(os.path.join(GITPATH, x))
@@ -120,10 +122,12 @@ def getActivity():
         a %= 3
         a += 1
         pname = project[0].upper() + project[1:]
-        if project in PODLINGS['podling'] and PODLINGS['podling'][project]['status'] != 'graduated':
-            pname = "Apache " + PODLINGS['podling'][project]['name'] + " (Incubating)"
         if project in TLPS['committees']:
             pname = "Apache " + TLPS['committees'][project]['display_name']
+        elif project in RETIRED['retired']:
+            pname = "Apache " + (RETIRED['retired'][project]['display_name'] or pname) + ' (Retired)'
+        elif project in PODLINGS['podling'] and PODLINGS['podling'][project]['status'] != 'graduated':
+            pname = "Apache " + PODLINGS['podling'][project]['name'] + " (Incubating)"
         
         outjson['projects'][project] = {
             'domain': project,
