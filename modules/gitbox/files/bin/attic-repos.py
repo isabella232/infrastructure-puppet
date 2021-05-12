@@ -41,7 +41,7 @@ CONFIG_FILE = "/x1/gitbox/matt/tools/grouper.cfg" # config file with GH token in
 CONFIG = ConfigParser.ConfigParser()
 CONFIG.read(CONFIG_FILE) # Shhhh
 TOKEN = CONFIG.get('github', 'token')
-
+RETIRE_BANNER = " -- Retired"
 
 def update_github_repo(token, old):
     """
@@ -77,6 +77,11 @@ def update_local_repo(old, project):
     Renames local repositories:
         - Change PR notification ML
     """
+    gcpath = "%s/%s/config" % (REPO_ROOT, new)
+    if not os.path.exists(gcpath):
+        gcpath = "%s/%s/.git/config" % (REPO_ROOT, new)
+    gconf = git.GitConfigParser(gcpath, read_only = False)
+    
     # ML notification targets for commits and PRs
     print("  - Changing notification options..")
     if gconf.has_option('hooks.asfgit', 'recips'):
@@ -88,6 +93,14 @@ def update_local_repo(old, project):
         print("    - Changing PR notification ML to %s" % ml)
         gconf.set('apache', 'dev', ml)
 
+    print("  - Touching nocommit file")
+    if not os.path.isfile("%s/%s/nocommit"):
+        open("%s/%s/nocommit" % (REPO_ROOT, project), 'a+')
+
+    print("  - Updating description")
+    if os.path.isfile("%s/%s/description"):
+        open("%s/%s/description" % (REPO_ROOT, project), 'a+') as desc:
+            desc.write(RETIRE_BANNER.rstrip('\n'))
     print("  - Done!")
 
 # Demand being run by www-data or git
