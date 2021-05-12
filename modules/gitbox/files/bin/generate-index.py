@@ -120,7 +120,7 @@ def getActivity():
         a %= 3
         a += 1
         pname = project[0].upper() + project[1:]
-        if project in PODLINGS['podling']:
+        if project in PODLINGS['podling'] and PODLINGS['podling'][project]['status'] != 'graduated':
             pname = "Apache " + PODLINGS['podling'][project]['name'] + " (Incubating)"
         if project in TLPS['committees']:
             pname = "Apache " + TLPS['committees'][project]['display_name']
@@ -207,5 +207,5 @@ repos = [x for x in os.listdir(GITPATH) if
              os.path.isdir(os.path.join(GITPATH, x))
         ]
 with open(TXTFILE, "w") as f:
-    f.write("\n".join(repos))
+    f.write("\n".join(sorted(repos)))
     f.close()
