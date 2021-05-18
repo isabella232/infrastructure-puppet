@@ -87,7 +87,7 @@ def main():
             has_set_db = True
         refs.append(ref)
         # Site writer role
-        if cfg.committer == "git-site-role" and not re.match(r".*(asf-site|asf-staging.*)$", ref.name):
+        if cfg.committer == "git-site-role" and not re.match(r".*(asf-site|asf-staging.*|-staging)$", ref.name):
             util.abort(u"git-site-role can only write to asf-site/asf-staging* branches!")
         if ref.is_protected(cfg.protect) and ref.is_rewrite():
             util.abort(NO_REWRITES % ref.name)
