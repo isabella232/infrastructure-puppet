@@ -189,7 +189,7 @@ def pelican(cfg, yml):
     autobuild = yml.get('autobuild')
     if autobuild:
         assert autobuild.endswith('/*'), "autobuild parameter must be $foo/*, e.g. site/* or feature/*"
-    do_autobuild = autobuild and fnmatch.fnmatch(ref, autobuild)
+    do_autobuild = autobuild and fnmatch.fnmatch(ref, autobuild) and not ref.endswith('-staging')  # don't autobuild the autobuilt
     if whoami and whoami != ref and not do_autobuild:
         return
     
