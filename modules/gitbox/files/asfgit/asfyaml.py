@@ -9,6 +9,7 @@ import os
 import yaml
 import asfpy.messaging
 import io
+import fnmatch
 
 # LDAP to CNAME mappings for some projects
 WSMAP = {
@@ -183,12 +184,20 @@ def pelican(cfg, yml):
         return
     
     # If whoami specified, ignore this payload if branch does not match
+    # Unless autobuilding matches...
     whoami = yml.get('whoami')
-    if whoami and whoami != ref:
+    autobuild = yml.get('autobuild')
+    if autobuild:
+        assert autobuild.endswith('/*'), "autobuild parameter must be $foo/*, e.g. site/* or feature/*"
+    do_autobuild = autobuild and fnmatch.fnmatch(ref, autobuild)
+    if whoami and whoami != ref and not do_autobuild:
         return
     
-    # Get target branch, if any, default to same branch
+    # Get target branch, if any, default to same branch or $branch-staging for autobuilds
     target = yml.get('target', ref)
+    if do_autobuild:
+        ref_bare = ref.replace(autobuild[:-1], '', 1) # site/foo -> foo
+        target = "%s/%s-staging" % ( autobuild[:-2], ref_bare)  # site/foo -> site/foo-staging
     
     # Get optional theme
     theme = yml.get('theme', 'theme')
@@ -567,8 +576,13 @@ def staging(cfg, yml):
     ref = yml.get('refname', 'master').replace('refs/heads/', '')
     
     # If whoami specified, ignore this payload if branch does not match
+    # Unless autostage is enabled here
+    autostage = yml.get('autostage')
+    if autostage:
+        assert autostage.endswith('/*'), "autostage parameter must be $foo/*, e.g. site/* or feature/*"
+    do_autostage = autostage and fnmatch.fnmatch(ref, autostage) and ref.endswith('-staging')  # site/foo-staging, matching site/*
     whoami = yml.get('whoami')
-    if whoami and whoami != ref:
+    if whoami and whoami != ref and not do_autostage:
         return
     
     subdir = yml.get('subdir', '')
@@ -576,8 +590,10 @@ def staging(cfg, yml):
         if not re.match(r"^[-_a-zA-Z0-9/]+$", subdir):
             raise Exception(".asf.yaml: Invalid subdir '%s' - Should be [-_A-Za-z0-9/]+ only!" % subdir)
     
-    # Get profile from .asf.yaml, if present
+    # Get profile from .asf.yaml, if present, or autostage derivation
     profile = yml.get('profile', '')
+    if do_autostage:
+        profile = ref.replace(autostage[:-1], '', 1)[:-8] # site/foo-staging -> foo -> $project-foo.staged.a.o
     
     # Try sending staging payload to pubsub
     try:
