@@ -188,6 +188,7 @@ def pelican(cfg, yml):
     whoami = yml.get('whoami')
     autobuild = yml.get('autobuild')
     if autobuild:
+        assert isinstance(autobuild, str), "autobuild parameter must be a string!"
         assert autobuild.endswith('/*'), "autobuild parameter must be $foo/*, e.g. site/* or feature/*"
     do_autobuild = autobuild and fnmatch.fnmatch(ref, autobuild) and not ref.endswith('-staging')  # don't autobuild the autobuilt
     if whoami and whoami != ref and not do_autobuild:
@@ -579,6 +580,7 @@ def staging(cfg, yml):
     # Unless autostage is enabled here
     autostage = yml.get('autostage')
     if autostage:
+        assert isinstance(autostage, str), "autostage parameter must be a string!"
         assert autostage.endswith('/*'), "autostage parameter must be $foo/*, e.g. site/* or feature/*"
     do_autostage = autostage and fnmatch.fnmatch(ref, autostage) and ref.endswith('-staging')  # site/foo-staging, matching site/*
     whoami = yml.get('whoami')
