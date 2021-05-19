@@ -706,6 +706,7 @@ def notifications(cfg, yml):
         if k != 'jira_options':
             if not RE_VALID_MAILINGLIST.match(v)\
                 or not (
+                    v.endswith('@apache.org') or
                     v.endswith('@%s.apache.org' % pname) or
                     v.endswith('@%s.incubator.apache.org' % pname)
                 ) or v not in valid_lists:
