@@ -34,7 +34,7 @@ VALID_NOTIFICATION_SCHEMES = [
         'jira_options'
 ]
 # regex for valid ASF mailing list
-RE_VALID_MAILINGLIST = re.compile(r"[-a-z0-9]+@[-a-z0-9]+(\.incubator)?\.apache\.org$")
+RE_VALID_MAILINGLIST = re.compile(r"[-a-z0-9]+@([-a-z0-9]+)?(\.incubator)?\.?apache\.org$")
 
 def jenkins(cfg, yml):
     
