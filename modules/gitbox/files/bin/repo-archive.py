@@ -118,7 +118,7 @@ def update_local_repo(repo, retire=False, debug=False):
         nocommit_file = os.path.join(REPO_ROOT, repo, "nocommit")
         if not os.path.isfile(nocommit_file):
             print("  - Creating %s" % nocommit_file)
-            with open(nocommit_file, "w") as f:
+            with open(nocommit_file, "w+") as f:
                 f.write("Repository retired at %s" % datetime.datetime.now().isoformat())
         print("  - Success!")
         print("  - Done!")
