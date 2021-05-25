@@ -90,7 +90,7 @@ def update_local_repo(repo, retire=False, debug=False):
     - Update the description with '-- Archived'
     - Touch nocommit file to ensure Read Only
     """
-
+	repo = repo + ".git"
     # Change git config options
     if not debug:
         # ML notification targets for commits and PRs for Attic
