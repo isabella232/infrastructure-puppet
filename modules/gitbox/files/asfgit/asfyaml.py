@@ -20,6 +20,11 @@ WSMAP = {
     'comdev': 'community',
 }
 
+# Repositories that override hostname for publishing
+WS_HOSTNAME_OVERRIDES = {
+    "comdev-events-site": "events.apache.org",
+}
+
 # Notification scheme setup
 NOTIFICATION_SETTINGS_FILE = 'notifications.yaml'
 VALID_LISTS_FILE = '/x1/gitbox/mailinglists.json'
@@ -639,7 +644,8 @@ def publish(cfg, yml):
     # Get optional target domain:
     target = yml.get('hostname', '')
     if 'apache.org' in target:
-        raise Exception(".asf.yaml: Invalid hostname '%s' - you cannot specify *.apache.org hostnames, they must be inferred!" % target)
+        if WS_HOSTNAME_OVERRIDES.get(cfg.repo_name, '') != target:
+            raise Exception(".asf.yaml: Invalid hostname '%s' - you cannot specify *.apache.org hostnames, they must be inferred!" % target)
     
     # If whoami specified, ignore this payload if branch does not match
     whoami = yml.get('whoami')
