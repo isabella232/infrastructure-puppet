@@ -221,6 +221,7 @@ def pelican(cfg, yml):
     
     # Get minimum page count
     minpages = yml.get('minimum_page_count', 0)
+    assert isinstance(minpages, int) and minpages >= 0, "minimum_page_count needs to be a positve integer!"
 
     # Contact buildbot 2
     bbusr, bbpwd = open("/x1/gitbox/auth/bb2.txt").read().strip().split(':', 1)
@@ -242,7 +243,7 @@ def pelican(cfg, yml):
             "theme": theme,
             "notify": pnotify,
             "toc": toc,
-            "minimum_page_count": minpages,
+            "minimum_page_count": "%u" % minpages,
         }
     }
     print("Triggering pelican build...")
