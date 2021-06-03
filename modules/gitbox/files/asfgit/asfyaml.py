@@ -218,6 +218,9 @@ def pelican(cfg, yml):
 
     # Get TOC boolean
     toc = yml.get('toc', True)
+    
+    # Get minimum page count
+    minpages = yml.get('minimum_page_count', 0)
 
     # Contact buildbot 2
     bbusr, bbpwd = open("/x1/gitbox/auth/bb2.txt").read().strip().split(':', 1)
@@ -239,6 +242,7 @@ def pelican(cfg, yml):
             "theme": theme,
             "notify": pnotify,
             "toc": toc,
+            "minimum_page_count": minpages,
         }
     }
     print("Triggering pelican build...")
