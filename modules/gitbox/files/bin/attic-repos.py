@@ -17,10 +17,8 @@
 """
 This is a retirement script for git repositories on gitbox, git-wip and git.a.o.
 When run on git-wip or gitbox, it:
-    - Renames the repositories locally
     - Updates git origins
     - Updates mailing list settings
-    - Renames the reposiories on GitHub
     - Marks them as archived (read-only)
 
 Usage: attic-repos.py $project, e.g.: attic-repos.py blur
