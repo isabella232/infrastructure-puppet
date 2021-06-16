@@ -163,7 +163,7 @@ $pbcsPwd  = ''
     'db-cleanup':
       user        => 'www-data',
       minute      => '45',
-      command     => "find /x1/gitbox/db/backups -mtime +7 -delete",
+      command     => "find /x1/gitbox/db/backups -mtime +2 -delete",
       require     => File['/x1/gitbox/db'];
     'generate-index':
       user        => 'www-data',
