@@ -573,6 +573,7 @@ def github(cfg, yml):
 
         # Collaborator list edits?
         if collabs:
+            assert isinstance(collabs, list), "Collaborators data must be a list of GitHub user IDs."
             collaborators(collabs, cfg, GH_TOKEN)
 
         # Save cached version for late checks
