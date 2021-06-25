@@ -204,7 +204,8 @@ class Event:
         self.typeof = data.get('type')
         self.action = data.get('action', 'comment')
         self.link = data.get('link', '')
-
+        self.recipient = get_recipient(self.repo, self.typeof, self.action)
+        self.payload['unsubscribe'] = self.recipient.replace('@', '-unsubscribe@')
         self.subject = None
         self.message = None
         self.updated = time.time()
@@ -251,7 +252,7 @@ class Event:
             print("[WARNING] Could not update JIRA: %s" % e)
 
     def send_email(self):
-        recipient = get_recipient(self.repo, self.typeof, self.action)
+        recipient = self.recipient
         print("[INFO] Sending email to %s: %s" % (recipient, self.subject))
         if DEBUG:
             return
