@@ -572,7 +572,7 @@ def github(cfg, yml):
                     print("Could not set GitHub Pages configuration!")
 
         # Collaborator list edits?
-        if collabs:
+        if collabs or isinstance(collabs, list):
             assert isinstance(collabs, list), "Collaborators data must be a list of GitHub user IDs."
             collaborators(collabs, cfg, GH_TOKEN)
 
