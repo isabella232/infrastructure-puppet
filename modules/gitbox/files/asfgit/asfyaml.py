@@ -41,6 +41,10 @@ VALID_NOTIFICATION_SCHEMES = [
 # regex for valid ASF mailing list
 RE_VALID_MAILINGLIST = re.compile(r"[-a-z0-9]+@([-a-z0-9]+)?(\.incubator)?\.?apache\.org$")
 
+# Collaborators file for GitHub triage role
+COLLABORATOR_FILE = "github_collaborators.txt"
+MAX_COLLABORATORS = 20  # We don't want more than 20 external collaborators
+
 def jenkins(cfg, yml):
     
     # GitHub PR Builder Whitelist for known (safe) contributors
@@ -434,6 +438,7 @@ def github(cfg, yml):
         ghp_path = yml.get('ghp_path', '/docs')
         autolink = yml.get('autolink') # TBD: https://help.github.com/en/github/administering-a-repository/configuring-autolinks-to-reference-external-resources
         protected_branches = yml.get('protected_branches')
+        collabs = yml.get('collaborators')
 
         if desc:
             repo.edit(description=desc)
@@ -566,6 +571,10 @@ def github(cfg, yml):
                 except:
                     print("Could not set GitHub Pages configuration!")
 
+        # Collaborator list edits?
+        if collabs:
+            assert isinstance(collabs, list), "Collaborators data must be a list of GitHub user IDs."
+            collaborators(collabs, cfg, GH_TOKEN)
 
         # Save cached version for late checks
         with open(ymlfile, "w") as f:
@@ -756,3 +765,30 @@ def notifications(cfg, yml):
         recipients=['private@%s.apache.org' % pname],
         subject="Notification schemes for %s.git updated" % cfg.repo_name,
         message=msg)
+
+
+def collaborators(collabs, cfg, token):
+    old_collabs = set()
+    new_collabs = set(collabs)
+    if len(new_collabs) > MAX_COLLABORATORS:
+        raise Exception("You can only have a maximum of %u external triage collaborators, please contact vp-infra@apache.org to request an exception." % MAX_COLLABORATORS)
+    if os.path.exists(COLLABORATOR_FILE):
+        old_collabs = set([x.strip() for x in open(COLLABORATOR_FILE) if x.strip()])
+    if new_collabs != old_collabs:
+        print("Updating collaborator list for GitHub")
+        to_remove = old_collabs - new_collabs
+        to_add = new_collabs - old_collabs
+        for user in to_remove:
+            print("Removing GitHub triage access for %s" % user)
+            requests.delete("https://api.github.com/repos/apache/%s/collaborators/%s" % (cfg.repo_name, user),
+                            headers={"Authorization": "token %s" % token}
+                            )
+        for user in to_add:
+            print("Adding GitHub triage access for %s" % user)
+            requests.put("https://api.github.com/repos/apache/%s/collaborators/%s" % (cfg.repo_name, user),
+                            headers={"Authorization": "token %s" % token},
+                            json={"permission": "triage"}
+                            )
+        with open(COLLABORATOR_FILE, "w") as f:
+            f.write("\n".join(collabs))
+            f.close()
