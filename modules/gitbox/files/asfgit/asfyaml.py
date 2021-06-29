@@ -772,6 +772,9 @@ def collaborators(collabs, cfg, token):
     new_collabs = set(collabs)
     if len(new_collabs) > MAX_COLLABORATORS:
         raise Exception("You can only have a maximum of %u external triage collaborators, please contact vp-infra@apache.org to request an exception." % MAX_COLLABORATORS)
+    for user in collabs:
+        if not re.match(r"^[A-Za-z\d](?:[A-Za-z\d]|-(?=[A-Za-z\d])){0,38}$", user):
+            raise Exception("Username %s in collaborator list is not a valid GitHub ID!" % user)
     if os.path.exists(COLLABORATOR_FILE):
         old_collabs = set([x.strip() for x in open(COLLABORATOR_FILE) if x.strip()])
     if new_collabs != old_collabs:
