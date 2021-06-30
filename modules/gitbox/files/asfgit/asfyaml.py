@@ -43,7 +43,7 @@ RE_VALID_MAILINGLIST = re.compile(r"[-a-z0-9]+@([-a-z0-9]+)?(\.incubator)?\.?apa
 
 # Collaborators file for GitHub triage role
 COLLABORATOR_FILE = "github_collaborators.txt"
-MAX_COLLABORATORS = 20  # We don't want more than 20 external collaborators
+MAX_COLLABORATORS = 10  # We don't want more than 10 external collaborators at any given time.
 
 def jenkins(cfg, yml):
     
