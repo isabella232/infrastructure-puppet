@@ -724,12 +724,11 @@ def notifications(cfg, yml):
             raise Exception("Invalid notification scheme '%s' detected, please remove it!" % k)
         # Verify that all set schemes pass muster and point to $foo@$project.a.o
         if k != 'jira_options':
-            if not RE_VALID_MAILINGLIST.match(v)\
-                or not (
+            if not (
                     v.endswith('@apache.org') or
                     v.endswith('@%s.apache.org' % pname) or
                     v.endswith('@%s.incubator.apache.org' % pname)
-                ) or v not in valid_lists:
+            ) or v not in valid_lists or not RE_VALID_MAILINGLIST.match(v):
                 raise Exception("Invalid notification target '%s'. Must be a valid @%s.apache.org list!" % (v, pname))
 
     # All seems kosher, update settings if need be
