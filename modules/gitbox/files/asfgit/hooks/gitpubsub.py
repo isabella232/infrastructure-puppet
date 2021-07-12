@@ -99,6 +99,6 @@ def send_json(data, key = "commit"):
     try:
         # pubsub.a.o payload
         requests.post("http://pubsub.apache.org:2069/git/%s/%s" % (cfg.repo_name, key),
-                      data = json.dumps({key: data}))
+                      data = json.dumps({key: data}), timeout=10)
     except:
         log.exception()
