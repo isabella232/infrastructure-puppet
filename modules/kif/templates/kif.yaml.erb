@@ -28,7 +28,7 @@ rules:
         procid:          '/usr/sbin/slapd'
         triggers:
             maxmemory:   50%
-            maxfds:      1024
+            maxfds:      2048
         runlist:
             - 'service slapd restart'
     elastic:
