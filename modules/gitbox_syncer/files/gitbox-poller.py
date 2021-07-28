@@ -295,12 +295,13 @@ def parse_payload(config, data):
             # Sometimes, github hiccups here!
             while i < 5 and rv:
                 i += 1
-                time.sleep(2)
                 p = subprocess.Popen(["git", "fetch", "--prune"],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE)
                 output,error = p.communicate()
                 rv = p.poll()
+                if rv:
+                    time.sleep(2)
             if not rv:
                 log += "[%s] [%s.git]: Git fetch succeeded\n" % (time.strftime("%c"), reponame)
                 try:
