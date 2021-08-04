@@ -12,6 +12,14 @@ classes:
   - ooo_mwiki
   - ssl::name::wildcard_openoffice_org
   - vhosts_asf::vhosts
+  - rsync_asf
+
+rsync_asf::cron_hour: 18
+rsync_asf::cron_minute: 55
+
+rsync_asf::fslist:
+  - /x1
+  - /home
 
 apache::keepalive: 'On'
 apache::keepalive_timeout: '15'
