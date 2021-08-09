@@ -11,6 +11,13 @@ classes:
   - vhosts_asf::modules
   - vhosts_asf::vhosts
   - mail_private
+  - rsync_asf
+
+rsync_asf::cron_hour: 19
+rsync_asf::cron_minute: 55
+
+rsync_asf::fslist:
+  - /x1
 
 mail_private::parent_dir: '/x1'
 

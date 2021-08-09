@@ -11,6 +11,14 @@ classes:
   - vhosts_asf::vhosts
   - vhosts_asf::custom_config
   - mail_archives
+  - rsync_asf
+
+
+rsync_asf::cron_hour: 14
+rsync_asf::cron_minute: 17
+
+rsync_asf::fslist:
+  - /x1
 
 mail_archives::parent_dir: '/x1'
 
