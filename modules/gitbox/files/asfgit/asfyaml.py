@@ -420,7 +420,7 @@ def github(cfg, yml):
             if cmp(oldyml, yml) == 0:
                 return
     except yaml.YAMLError as e: # Failed to parse old yaml? bah.
-        pass
+        print("Failed to parse previous GitHub settings, please notify users@infra.apache.org")
     
     # Update items
     print("GitHub meta-data changed, updating...")
