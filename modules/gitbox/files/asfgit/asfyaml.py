@@ -578,7 +578,7 @@ def github(cfg, yml):
 
         # Save cached version for late checks
         with open(ymlfile, "w") as f:
-            f.write(yaml.dump(yml, default_flow_style=False))
+            f.write(yaml.dump(yml, default_flow_style=False, sort_keys=False))
 
 def staging(cfg, yml):
     """ Staging for websites. Sample entry .asf.yaml entry:
