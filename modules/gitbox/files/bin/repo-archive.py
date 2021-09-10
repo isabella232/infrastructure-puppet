@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -23,7 +23,8 @@ When run on gitbox:
         - Updates mailing list settings if necessary
         - Creates a nocommit file to render the repo read-only
         - Appends '-- Retired' to the repo description.
-   If archive_repo is specified:
+
+    If archive_repo is specified:
         - Archived the repository on GitHub
         - Updates the git origin for the corresponding GitBox repo.
         - Creates a nocommit file to render the repo read-only
@@ -31,7 +32,11 @@ When run on gitbox:
 
 Usage: repo-archive.py [(-A/--archive_repo)|(-R/--retire_project)] -n/--name,
 e.g.:
+
+Retire the entire 'blur' project:
 www-data$: python3 ./repo-archive.py -Rn blur
+
+Archive the 'nifi-minifi' repository:
 www-data$: python3 ./repo-archive.py -An nifi-minifi
 
 NB: MUST BE RUN AS www-data!
@@ -93,7 +98,6 @@ def update_local_repo(repo, retire=False, debug=False):
     repo = repo + ".git"
     # Change git config options
     if not debug:
-        # ML notification targets for commits and PRs for Attic
         if retire:
             # Rewire notifications.yaml to send to @attic.a.o
             noti_file = os.path.join(REPO_ROOT, repo, "notifications.yaml")
@@ -103,14 +107,16 @@ def update_local_repo(repo, retire=False, debug=False):
                 "issues": "dev@attic.apache.org",
             }
             yaml.dump(retire_config, open(noti_file, "w"))
+            description = " -- Retired"
+        else:
+            description = " -- Archived"
 
         # Update Repo description
         desc_file = os.path.join(REPO_ROOT, repo, "description")
         if os.path.isfile(desc_file):
             print("  - Updating description file %s" % desc_file)
-            archive_flag = " -- Archived"
             with open(desc_file, "a+") as desc:
-                desc.write(archive_flag)
+                desc.write(description)
                 desc.close()
 
         # Set GitBox repo to read-only
@@ -161,16 +167,16 @@ def main():
                 if m:
                     pr += 1
                     print("Archiving %s..." % repo)
-                    update_github_repo(TOKEN, repo, debug=args.debug)
                     update_local_repo(repo, retire=True, debug=args.debug)
+                    update_github_repo(TOKEN, repo, debug=args.debug)
             print("All done, processed %u repositories!" % pr)
 
     if args.archive_repo:
         repo = args.name
         if os.path.isdir(os.path.join(REPO_ROOT, "%s.git" % args.name)):
             print("Archiving %s..." % args.name)
-            update_github_repo(TOKEN, repo, debug=args.debug)
             update_local_repo(repo, debug=args.debug)
+            update_github_repo(TOKEN, repo, debug=args.debug)
         print("All done!")
 
 
