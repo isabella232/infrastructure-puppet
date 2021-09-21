@@ -214,19 +214,19 @@ gitbox::custom_fragment_443: |
 
       # Bunch of rewrites for INFRA-17956
       RewriteCond %%{}{QUERY_STRING} p=([^;.]+)\.git;a=commitdiff.*?h=([a-f0-9]+)
-      RewriteRule .* https://github.com/apache/%1/commit/%2/ [QSD]
+      RewriteRule .* https://github.com/apache/%1/commit/%2 [QSD]
 
       RewriteCond %%{}{QUERY_STRING} p=([^;.]+)\.git;a=history.*?;f=([^*].*?);.*?hb=([a-f0-9]+)
-      RewriteRule .* https://github.com/apache/%1/commits/%3/%2/ [QSD]
+      RewriteRule .* https://github.com/apache/%1/commits/%3/%2 [QSD]
 
       RewriteCond %%{}{QUERY_STRING} p=([^;.]+)\.git;a=blobdiff.*?hb=([a-f0-9]+)
-      RewriteRule .* https://github.com/apache/%1/commit/%2/ [QSD]
+      RewriteRule .* https://github.com/apache/%1/commit/%2 [QSD]
 
       RewriteCond %%{}{QUERY_STRING} p=([^;.]+)\.git;a=tree.*?;h=([a-f0-9]+);hb=([a-f0-9]+)
-      RewriteRule .* https://github.com/apache/%1/tree/%3/ [QSD]
+      RewriteRule .* https://github.com/apache/%1/tree/%3 [QSD]
 
       RewriteCond %%{}{QUERY_STRING} p=([^;.]+)\.git;a=patch.*?h=(.*)
-      RewriteRule .* https://github.com/apache/%1/commit/%2.patch/ [QSD]
+      RewriteRule .* https://github.com/apache/%1/commit/%2.patch [QSD]
 
       # Redirect to static index when /repos/asf is requested
       RewriteCond %%{}{QUERY_STRING} ^$
