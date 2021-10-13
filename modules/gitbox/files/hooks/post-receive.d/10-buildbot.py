@@ -30,6 +30,7 @@ import re
 import subprocess as sp
 import sys
 import private
+sys.path.append(os.environ["ASFGIT_ADMIN"])
 import asfgit.cfg as cfg
 
 from twisted.spread import pb
