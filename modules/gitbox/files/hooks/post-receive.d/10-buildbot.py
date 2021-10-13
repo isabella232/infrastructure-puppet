@@ -30,6 +30,7 @@ import re
 import subprocess as sp
 import sys
 import private
+import asfgit.cfg as cfg
 
 from twisted.spread import pb
 from twisted.cred import credentials
@@ -58,6 +59,7 @@ repository = None
 try:
     GIT_CMD = ["/usr/bin/git", "config", "hooks.asfgit.buildbot-project"]
     project = sp.check_output(GIT_CMD).strip()
+    master = cfg._git_config("hooks.asfgit.buildbot-server", master)  # If found, use, otherwise fall back to default
 except:
     sys.exit(0)
 
