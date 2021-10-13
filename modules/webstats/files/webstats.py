@@ -75,7 +75,7 @@ def makeBook(domain):
                     "aggs": {
                         "uniques": {
                             "cardinality": {
-                                "field": "clientip.keyword"
+                                "field": "client_ip.keyword"
                             }
                         }
                     }

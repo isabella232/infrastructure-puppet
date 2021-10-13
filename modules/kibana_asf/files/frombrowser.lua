@@ -59,9 +59,9 @@ if p then
     end
     for host in data:gmatch("log%-access%-vhost: ([^\r\n]+)") do
         host = host:gsub("%.apache%.org", "")
-        table.insert(hosts, ([[(vhost:"%s.apache.org" AND logtype:"httpd_access")]]):format(host))
+        table.insert(hosts, ([[(vhost:"%s.apache.org" AND logtype:"apache_access")]]):format(host))
         if host == "*" then
-            table.insert(hosts, ([[logtype:"httpd_access"]]):format(host))
+            table.insert(hosts, ([[logtype:"apache_access"]]):format(host))
         end
     end
 end

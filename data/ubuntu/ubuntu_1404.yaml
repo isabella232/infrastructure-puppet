@@ -1,3 +1,4 @@
+
 ---
 classes:
   - apt
@@ -49,9 +50,9 @@ apache::mod::geoip::db_file:
 apache::mod::ssl::ssl_cipher: 'HIGH:MEDIUM:!aNULL:!MD5:!RC4'
 
 apache::log_formats:
-  combined: '<%%JSON:httpd_access%%> {
+  combined: '<%%JSON:apache_access%%> {
     \"time\": \"%%{HIERA}{%Y-%m-%dT%H:%M:%S%z}t\",
-    \"clientip\": \"%a\",
+    \"client_ip\": \"%a\",
     \"duration\": %D,
     \"status\": %>s,
     \"request\": \"%U%q\",

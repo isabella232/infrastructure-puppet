@@ -47,9 +47,9 @@ apache::mod::ssl::ssl_cipher: 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GC
 apache::mod::ssl::ssl_protocol: ['all', '-SSLv2', '-SSLv3', '-TLSv1', '-TLSv1.1']
 
 apache::log_formats:
-  combined: '<%%JSON:httpd_access%%> {
+  combined: '<%%JSON:apache_access%%> {
     \"time\": \"%%{HIERA}{%Y-%m-%dT%H:%M:%S%z}t\",
-    \"clientip\": \"%a\",
+    \"client_ip\": \"%a\",
     \"duration\": %D,
     \"status\": %>s,
     \"request\": \"%U%q\",
