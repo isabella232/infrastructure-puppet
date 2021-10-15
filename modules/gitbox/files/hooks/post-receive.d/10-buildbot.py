@@ -94,7 +94,7 @@ def addChanges(remote, changei, src='git'):
         for key, value in c.iteritems():
             logging.debug("  %s: %s" % (key, value))
 
-        c['src'] = src
+        c[u'src'] = src
         d = remote.callRemote('addChange', c)
         return d
 
@@ -146,13 +146,13 @@ def grab_commit_info(c, rev):
         m = re.match(r"^Author:\s+(.+)$", line)
         if m:
             logging.debug("Got author: %s" % m.group(1))
-            c['who'] = unicode(m.group(1), encoding=encoding)
+            c[u'who'] = unicode(m.group(1), encoding=encoding)
 
         if re.match(r"^Merge: .*$", line):
             files.append('merge')
 
-    c['comments'] = ''.join(comments)
-    c['files'] = files
+    c[u'comments'] = ''.join(comments)
+    c[u'files'] = files
     status = f.close()
     if status:
         logging.warning("git show exited with status %d" % status)
@@ -167,18 +167,18 @@ def gen_changes(input, branch):
         logging.debug("Change: %s" % line)
 
         m = re.match(r"^([0-9a-f]+) (.*)$", line.strip())
-        c = {'revision': m.group(1),
-             'branch': unicode(branch, encoding=encoding),
+        c = {u'revision': m.group(1),
+             u'branch': unicode(branch, encoding=encoding),
         }
 
         if category:
-            c['category'] = unicode(category, encoding=encoding)
+            c[u'category'] = unicode(category, encoding=encoding)
 
         if repository:
-            c['repository'] = unicode(repository, encoding=encoding)
+            c[u'repository'] = unicode(repository, encoding=encoding)
 
         if project:
-            c['project'] = unicode(project, encoding=encoding)
+            c[u'project'] = unicode(project, encoding=encoding)
 
         grab_commit_info(c, m.group(1))
         changes.append(c)
@@ -221,10 +221,10 @@ def gen_update_branch_changes(oldrev, newrev, refname, branch):
     baserev = commands.getoutput("git merge-base %s %s" % (oldrev, newrev))
     logging.debug("oldrev=%s newrev=%s baserev=%s" % (oldrev, newrev, baserev))
     if baserev != oldrev:
-        c = {'revision': baserev,
-             'comments': "Rewind branch",
-             'branch': unicode(branch, encoding=encoding),
-             'who': "dummy",
+        c = {u'revision': baserev,
+             u'comments': "Rewind branch",
+             u'branch': unicode(branch, encoding=encoding),
+             u'who': "dummy",
         }
         logging.info("Branch %s was rewound to %s" % (branch, baserev[:8]))
         files = []
@@ -243,16 +243,16 @@ def gen_update_branch_changes(oldrev, newrev, refname, branch):
             logging.warning("git diff exited with status %d" % status)
 
         if category:
-            c['category'] = unicode(category, encoding=encoding)
+            c[u'category'] = unicode(category, encoding=encoding)
 
         if repository:
-            c['repository'] = unicode(repository, encoding=encoding)
+            c[u'repository'] = unicode(repository, encoding=encoding)
 
         if project:
-            c['project'] = unicode(project, encoding=encoding)
+            c[u'project'] = unicode(project, encoding=encoding)
 
         if files:
-            c['files'] = files
+            c[u'files'] = files
             changes.append(c)
 
     if newrev != baserev:
