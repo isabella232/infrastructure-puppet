@@ -28,7 +28,7 @@ def main():
     # Hooks must be processed in alpha order
     for hook in sorted(os.listdir(HOOKS_DIR)):
         hook = os.path.join(HOOKS_DIR, hook)
-        if not is_executable(hook):
+        if not is_executable(hook) or not hook.endswith(".py"):
             continue
         run_hook(hook, stdin)
 
